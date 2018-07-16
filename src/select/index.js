@@ -130,7 +130,11 @@ export default class A11ySelect extends HTMLElement {
                     return;
                 }
                 
+                // highlights option starting with pressed key
+                this.typeahead(event.key);
+
             }
+
         });
     }
 
@@ -191,6 +195,61 @@ export default class A11ySelect extends HTMLElement {
                 $option.highlighted = true;
             }
         });
+    }
+
+    // highlight the first option that starts with
+    // the given key or key sequence
+    typeahead(key) {
+
+        // Cancel a potential timeout that has been set after
+        // previous keyboard events
+        if(this._typeaheadTimeout) {
+            clearTimeout(this._typeaheadTimeout);
+        }
+
+        // Set the string options will be filtered for. This is
+        // either a single character, the given key, or if other
+        // keys have been pressed before, the a sequence of keys.
+        let filter = (this._typeaheadCache ? this._typeaheadCache : '') + event.key;
+        let $options = this._getOptionNodes();
+
+        // Find the first option that matches the filter string. In
+        // the case that no option matches the full filter string,
+        // this also filters for the single character, that has been
+        // pressed most recently.
+        let $fullMatch = null;
+        let $partialMatch = null;
+
+        for(let $option of $options) {
+            let label = $option.label.toLowerCase();
+
+            if(!$fullMatch && label.startsWith(filter)) {
+                $fullMatch = $option;
+                break;
+            } else if(!$partialMatch && label.startsWith(event.key)) {
+                $partialMatch = $option;
+            }
+        }
+
+        // If a fullly or partially matching option has been,
+        // it is highlighted and the cache is updated.
+        if($fullMatch) {
+            this.highlight($fullMatch);
+            this._typeaheadCache = filter;
+        } else if($partialMatch) {
+            this.highlight($partialMatch);
+            this._typeaheadCache = event.key;
+        } else {
+            this._typeaheadCache = null;
+        }
+
+        // Finally, a timeout is set to reset the filter cache
+        // after a given period of inactivity. If a new key is
+        // pressed before the timeout expires, it is cancelled
+        // at the beginning of this method.
+        this._typeaheadTimeout = setTimeout(() => {
+            this._typeaheadCache = null;
+        }, 500);
     }
 
     toggle() {
