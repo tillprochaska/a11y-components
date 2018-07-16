@@ -1,0 +1,100 @@
+:host {
+    --font-size: 16px;
+    --spacing-unit: calc(1.5 * var(--font-size));
+    --font-family: system-ui;
+    --color: #333;
+
+    --padding-v: calc(.375 * var(--spacing-unit));
+    --padding-h: calc(.5 * var(--spacing-unit));
+    --icon-size: var(--spacing-unit);
+
+    --border-radius: 2px;
+    --border-color: #ccc;
+    --border-color-light: #eee;
+    --border-focus-color: rgb(0, 161, 255);
+    --box-shadow-focus-color: rgba(0, 161, 255, .125);
+    --background-color: #f4f4f4;
+}
+
+:host {
+    position: relative;
+
+    display: inline-block;
+    font-size: var(--font-size);
+    line-height: var(--spacing-unit);
+
+    font-family: var(--font-family);
+    color: var(--color);
+    background-color: var(--background-color);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+
+    cursor: default;
+    user-select: none;
+    outline: none;
+}
+
+.select-field {
+    position: relative;
+    height: var(--spacing-unit);
+    padding: var(--padding-v) var(--padding-h);
+    padding-right: calc(2 * var(--padding-v) + var(--icon-size));
+
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.select-field-icon {
+    position: absolute;
+    top: 50%;
+    right: var(--padding-h);
+    transform: translateY(-50%);
+
+    width: var(--icon-size);
+    height: var(--icon-size);
+    fill: var(--color);
+}
+
+.select-options {
+    position: absolute;
+    left: -1px;
+    right: -1px;
+    overflow: hidden;
+
+    display: none;
+    margin-top: 0;
+
+    background-color: #fff;
+    border: 1px solid var(--border-color);
+    border-bottom-left-radius: var(--border-radius);
+    border-bottom-right-radius: var(--border-radius);
+}
+
+/*
+ * Focus State
+ */
+:host(:focus) {
+    border-color: var(--border-focus-color);
+    box-shadow: 0 0 0 3px var(--box-shadow-focus-color);
+}
+
+:host(:focus) > .select-options {
+    border-top-color: var(--border-focus-color);
+}
+
+/*
+ * Expanded State
+ */
+:host([aria-expanded="true"]) {
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+}
+
+:host([aria-expanded="true"]) > .select-field > .select-field-icon {
+    transform: translateY(-50%) rotate(180deg);
+}
+
+:host([aria-expanded="true"]) > .select-options {
+    display: block;
+}
