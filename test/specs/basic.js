@@ -121,14 +121,19 @@ describe('basic select component', () => {
             isSelected('Apples');
         });
 
-        it('highlights the first option that begins with that key after pressing a key', () => {
-            browser.keys(['B']);
+        it('highlights first option starting with pressed key', () => {
+            browser.keys(['b']);
             isHighlighted('Bananas');
         });
 
-        it('highlights the first option that starts with that string after pressing multiple keys successively', () => {
-            browser.keys(['B', 'L']);
+        it('highlights first option starting with a sequence of pressed keys', () => {
+            browser.keys(['b', 'l']);
             isHighlighted('Blueberries');
+        });
+
+        it('highlights first option starting with the key pressed most recently if no option matches full key sequence', () => {
+            browser.keys(['b', 'l', 'o']);
+            isHighlighted('Oranges');
         });
 
         it('selects the currently highlighted option on space bar', () => {
