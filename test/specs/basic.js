@@ -93,65 +93,78 @@ describe('basic select component', () => {
 
     });
 
-    describe('if open and focussed', () => {
+    describe('if open', () => {
 
         beforeEach(() => {
             browser.click('a11y-select');
-            isSelected('Apples');
+        });
+
+        it('highlights selected option', () => {
             isHighlighted('Apples');
         });
 
-        it('closes on blur', () => {
-            browser.keys(['Tab']);
-            isClosed();
-        });
-
-        it('closes on click', () => {
-            browser.click('a11y-select');
-            isClosed();
-        });
-
-        it('highlights prev/next option on arrow up/down', () => {
-            browser.keys(['ArrowDown']);
-            isHighlighted('Mangos');
-            isSelected('Apples');
-
+        it('highlights option if the mouse is moved within that option', () => {
+            browser.moveToObject('a11y-select-option:nth-child(3)', 5, 5);
             browser.keys(['ArrowUp']);
-            isHighlighted('Apples');
-            isSelected('Apples');
-        });
-
-        it('highlights first option starting with pressed key', () => {
-            browser.keys(['b']);
+            browser.moveToObject('a11y-select-option:nth-child(3)', 10, 10);
             isHighlighted('Bananas');
         });
 
-        it('highlights first option starting with a sequence of pressed keys', () => {
-            browser.keys(['b', 'l']);
-            isHighlighted('Blueberries');
-        });
+        describe('if focussed', () => {
 
-        it('highlights first option starting with the key pressed most recently if no option matches full key sequence', () => {
-            browser.keys(['b', 'l', 'o']);
-            isHighlighted('Oranges');
-        });
+            it('closes on blur', () => {
+                browser.keys(['Tab']);
+                isClosed();
+            });
 
-        it('selects the currently highlighted option on space bar', () => {
-            browser.keys(['ArrowDown', ' ']);
-            isSelected('Mangos');
-            isClosed();
-        });
+            it('closes on click', () => {
+                browser.click('a11y-select');
+                isClosed();
+            });
 
-        it('selects the currently highlighted option on enter', () => {
-            browser.keys(['ArrowDown', 'Enter']);
-            isSelected('Mangos');
-            isClosed();
-        });
+            it('highlights prev/next option on arrow up/down', () => {
+                browser.keys(['ArrowDown']);
+                isHighlighted('Mangos');
+                isSelected('Apples');
 
-        it('does not change the selected option on escape', () => {
-            browser.keys(['ArrowDown', 'Escape']);
-            isSelected('Apples');
-            isClosed();
+                browser.keys(['ArrowUp']);
+                isHighlighted('Apples');
+                isSelected('Apples');
+            });
+
+            it('highlights first option starting with pressed key', () => {
+                browser.keys(['b']);
+                isHighlighted('Bananas');
+            });
+
+            it('highlights first option starting with a sequence of pressed keys', () => {
+                browser.keys(['b', 'l']);
+                isHighlighted('Blueberries');
+            });
+
+            it('highlights first option starting with the key pressed most recently if no option matches full key sequence', () => {
+                browser.keys(['b', 'l', 'o']);
+                isHighlighted('Oranges');
+            });
+
+            it('selects the currently highlighted option on space bar', () => {
+                browser.keys(['ArrowDown', ' ']);
+                isSelected('Mangos');
+                isClosed();
+            });
+
+            it('selects the currently highlighted option on enter', () => {
+                browser.keys(['ArrowDown', 'Enter']);
+                isSelected('Mangos');
+                isClosed();
+            });
+
+            it('does not change the selected option on escape', () => {
+                browser.keys(['ArrowDown', 'Escape']);
+                isSelected('Apples');
+                isClosed();
+            });
+
         });
 
     });
