@@ -107,6 +107,7 @@ export default class A11ySelect extends HTMLElement {
 
                 // opens select on arrow up/down or space key
                 if([' ', 'Spacebar', 'ArrowUp', 'ArrowDown'].includes(event.key)) {
+                    event.preventDefault();
                     this.open();
                     return;
                 }
@@ -121,15 +122,23 @@ export default class A11ySelect extends HTMLElement {
 
                 // highlights previous option on arrow up
                 if(event.key === 'ArrowUp') {
+                    event.preventDefault();
+
                     let $prev = this._getHighlightedOptionNode()._getPreviousOptionNode();
+                    this._scrollOptionIntoView($prev, 'top');
                     this.highlight($prev);
+
                     return;
                 }
 
                 // highlights next option on arrow down
                 if(event.key === 'ArrowDown') {
+                    event.preventDefault();
+
                     let $next = this._getHighlightedOptionNode()._getNextOptionNode();
+                    this._scrollOptionIntoView($next, 'bottom');
                     this.highlight($next);
+
                     return;
                 }
                 
@@ -137,7 +146,6 @@ export default class A11ySelect extends HTMLElement {
                 this.typeahead(event.key);
 
             }
-
         });
     }
 
@@ -284,12 +292,38 @@ export default class A11ySelect extends HTMLElement {
     open() {
         this.isOpen = true;
         this.setAttribute('aria-expanded', 'true');
+        this._scrollOptionIntoView(this.value);
         this.highlight(this.value);
     }
 
     close() {
         this.isOpen = false;
         this.setAttribute('aria-expanded', 'false');
+    }
+
+    // This methods makes sure that the given option is
+    // in the visible part of the options list. The second
+    // parameter specifies the scroll direction. If the
+    // given is not visible, `top` and `bottom` scroll the
+    // option to the top and bottom of the list, respectively.
+    _scrollOptionIntoView(option, dir = 'top') {
+        if(!option) return;
+
+        let $option      = this._getOptionNode(option);
+        let listScroll   = this.$options.scrollTop;
+        let listHeight   = this.$options.getBoundingClientRect().height;
+        let optionTop    = $option.offsetTop;
+        let optionHeight = $option.getBoundingClientRect().height;
+
+        if(optionTop < listScroll || optionTop + optionHeight > listScroll + listHeight) {
+            if(dir === 'top') {
+                // option is scrolled to the top
+                this.$options.scrollTop = optionTop;
+            } else {
+                // option is scrolled top the bottom
+                this.$options.scrollTop = optionTop - listHeight + optionHeight;
+            }
+        }
     }
 
     _getOptionNodes() {
@@ -307,7 +341,7 @@ export default class A11ySelect extends HTMLElement {
         let $options = this._getOptionNodes();
 
         if(option instanceof A11ySelectOption) {
-            return $options.find($option => $option === option);
+            return option;
         } else {
             return $options.find($option => $option.value === option);
         }
