@@ -39,15 +39,22 @@ export default class A11ySelectOption extends HTMLElement {
     }
 
     _addListeners() {
-        this.addEventListener('click', () => {
-            let event = new CustomEvent('select', { bubbles: true });
-            this.dispatchEvent(event);
+        this.addEventListener('click', event => {
+            // Stopping the event from bubbling up in order
+            // to prevent event listeners on the main select
+            // to reopen the component etc.
+            event.stopPropagation();
+            let click = new CustomEvent('select', { bubbles: true });
+            this.dispatchEvent(click);
         });
 
-        this.addEventListener('keydown', () => {
+        this.addEventListener('keydown', event => {
             if([' ', 'Spacebar', 'Enter'].includes(event.key)) {
-                let event = new CustomEvent('select', { bubbles: true });
-                this.dispatchEvent(event);
+                // Stopping event propagation for the same
+                // reasons as above.
+                event.stopPropagation();
+                let select = new CustomEvent('select', { bubbles: true });
+                this.dispatchEvent(select);
             }
         });
 
