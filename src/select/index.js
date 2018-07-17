@@ -121,15 +121,6 @@ export default class A11ySelect extends HTMLElement {
                     return;
                 }
 
-                // selects currently highlighted option on space/return key
-                if([' ', 'Spacebar', 'Enter'].includes(event.key)) {
-                    let $highlighted = this._getHighlightedOptionNode();
-                    this.select($highlighted);
-                    this.close();
-                    this.focus();
-                    return;
-                }
-
                 // highlights previous option on arrow up
                 if(event.key === 'ArrowUp') {
                     let $prev = this._getHighlightedOptionNode()._getPreviousOptionNode();

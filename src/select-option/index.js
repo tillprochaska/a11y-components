@@ -44,6 +44,13 @@ export default class A11ySelectOption extends HTMLElement {
             this.dispatchEvent(event);
         });
 
+        this.addEventListener('keydown', () => {
+            if([' ', 'Spacebar', 'Enter'].includes(event.key)) {
+                let event = new CustomEvent('select', { bubbles: true });
+                this.dispatchEvent(event);
+            }
+        });
+
         this.addEventListener('mousemove', () => {
             if(!this.highlighted) {
                 let event = new CustomEvent('highlight', { bubbles: true });
