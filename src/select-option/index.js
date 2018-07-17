@@ -7,7 +7,7 @@ export default class A11ySelectOption extends HTMLElement {
     constructor() {
         super();
 
-        this.setAttribute('role', 'menuitem');
+        this.setAttribute('role', 'option');
         this.tabIndex = -1;
     }
 

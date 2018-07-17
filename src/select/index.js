@@ -10,8 +10,8 @@ export default class A11ySelect extends HTMLElement {
         super();
 
         this.tabIndex = 0;
-        this.setAttribute('role', 'menu');
-        this.setAttribute('aria-haspopup', 'true');
+        this.setAttribute('role', 'button');
+        this.setAttribute('aria-haspopup', 'listbox');
         this.close();
     }
 
@@ -26,7 +26,6 @@ export default class A11ySelect extends HTMLElement {
         this.$label = createElement('span', {
             attrs: {
                 class: 'select-field-label',
-                role: 'presentation'
             }
         });
 
@@ -48,7 +47,6 @@ export default class A11ySelect extends HTMLElement {
         this.$field = createElement('div', {
             attrs: {
                 class: 'select-field',
-                role: 'presentation'
             },
             html: [ this.$label, $icon ]
         });
@@ -57,7 +55,7 @@ export default class A11ySelect extends HTMLElement {
         this.$options = createElement('div', {
             attrs: {
                 class: 'select-options',
-                role: 'presentation'
+                role: 'listbox',
             },
             html: createElement('slot')
         });
@@ -143,6 +141,18 @@ export default class A11ySelect extends HTMLElement {
         });
     }
 
+    get label() {
+        return this.hasAttribute('label') ? this.getAttribute('label') : null;
+    }
+
+    set label(value) {
+        if(value) {
+            this.setAttribute('label', value);
+        } else {
+            this.removeAttribute('label');
+        }
+    }
+
     get value() {
         let $options = this._getOptionNodes();
         let $selected = this._getSelectedOptionNode();
@@ -182,7 +192,11 @@ export default class A11ySelect extends HTMLElement {
 
         // update the select’s label
         this.$label.innerHTML = $selected.label;
-        // this.setAttribute('aria-label', $selected.label);
+        if(this.label) {
+            this.setAttribute('aria-label', `${ this.label }: ${ $selected.label }`);
+        } else {
+            this.setAttribute('aria-label', $selected.label);
+        }
     }
 
     // highlight an option by element reference or value
