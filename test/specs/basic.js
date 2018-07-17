@@ -24,7 +24,7 @@ let isSelected = (value) => {
 };
 
 let isHighlighted = (value) => {
-    browser.getHTML('a11y-select-option[highlighted]', false).should.equal(value);
+    browser.getHTML('a11y-select-option:focus', false).should.equal(value);
 };
 
 describe('basic select component', () => {
@@ -51,10 +51,6 @@ describe('basic select component', () => {
 
             it('is open', () => {
                 isExpanded();
-            });
-
-            it('has focus', () => {
-                isFocussed();
             });
 
             it('has highlighted the currently selected option', () => {
@@ -103,11 +99,31 @@ describe('basic select component', () => {
             isHighlighted('Apples');
         });
 
+        it('highlights option on mouseover', () => {
+            browser.moveToObject('a11y-select-option:nth-child(3)');
+            isHighlighted('Bananas');
+        });
+
         it('highlights option if the mouse is moved within that option', () => {
             browser.moveToObject('a11y-select-option:nth-child(3)', 5, 5);
             browser.keys(['ArrowUp']);
             browser.moveToObject('a11y-select-option:nth-child(3)', 10, 10);
             isHighlighted('Bananas');
+        });
+
+        it('selects an option on click', () => {
+            browser.click('a11y-select-option:nth-child(3)');
+            isSelected('Bananas');
+        });
+
+        it('restores focus after selecting an option via keyboard', () => {
+            browser.keys(['ArrowDown', 'ArrowDown', 'Enter']);
+            isFocussed();
+        });
+
+        it('restores focus after selecting an option via mouse click', () => {
+            browser.click('a11y-select-option:nth-child(3)');
+            isFocussed();
         });
 
         describe('if focussed', () => {

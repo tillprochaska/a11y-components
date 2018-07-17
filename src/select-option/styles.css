@@ -25,15 +25,16 @@
  * Highlighted State
  */
 
-:host([highlighted]), :host([selected]) {
+:host(:focus), :host([selected]) {
     padding-right: calc(2 * var(--padding-h) + .9 * var(--icon-size));
 }
 
-:host([highlighted]) {
+:host(:focus) {
     background-color: var(--background-color);
+    outline: none;
 }
 
-:host([highlighted]) > .select-option-icon {
+:host(:focus) > .select-option-icon {
 	display: block;
 	fill: #999;
 }

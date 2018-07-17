@@ -6,7 +6,9 @@ export default class A11ySelectOption extends HTMLElement {
 
     constructor() {
         super();
-        this.setAttribute('role', 'option');
+
+        this.setAttribute('role', 'menuitem');
+        this.tabIndex = -1;
     }
 
     connectedCallback() {
@@ -84,19 +86,17 @@ export default class A11ySelectOption extends HTMLElement {
             this.setAttribute('aria-selected', 'true');
         } else {
             this.removeAttribute('selected');
-            this.removeAttribute('aria-selected');
+            this.setAttribute('aria-selected', 'false');
         }
     }
 
     get highlighted() {
-        return this.hasAttribute('highlighted');
+        return document.activeElement === this;
     }
 
     set highlighted(value) {
         if(value) {
-            this.setAttribute('highlighted', '');
-        } else {
-            this.removeAttribute('highlighted');
+            this.focus();
         }
     }
 
