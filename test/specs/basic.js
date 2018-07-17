@@ -1,31 +1,10 @@
+const { isExpanded, isClosed, isFocussed, isSelected, isHighlighted } = require('../support/helpers.js');
+
 const chai = require('chai');
 global.expect = chai.expect;
 chai.Should();
 
-const URL = '/test/fixtures/basic.html';
-
-let isExpanded = () => {
-    browser.isVisible('a11y-select-option:first-child').should.be.true;
-    browser.getAttribute('a11y-select', 'aria-expanded').should.equal('true');
-};
-
-let isClosed = () => {
-    browser.isVisible('a11y-select-option:first-child').should.be.false;
-    browser.getAttribute('a11y-select', 'aria-expanded').should.equal('false');
-};
-
-let isFocussed = () => {
-    browser.hasFocus('a11y-select').should.be.true;
-}
-
-let isSelected = (value) => {
-    browser.getHTML('a11y-select-option[selected]', false).should.equal(value);
-    browser.getHTML('a11y-select-option[aria-selected="true"]', false).should.equal(value);
-};
-
-let isHighlighted = (value) => {
-    browser.getHTML('a11y-select-option:focus', false).should.equal(value);
-};
+const URL = '/test/fixtures/basic';
 
 describe('basic select component', () => {
 
