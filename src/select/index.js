@@ -141,11 +141,19 @@ export default class A11ySelect extends HTMLElement {
 
                     return;
                 }
-                
-                // highlights option starting with pressed key
-                this.typeahead(event.key);
 
             }
+
+            // directly select matching option if closed,
+            // otherwise just highlight
+            if(!this.isOpen) {
+                let $match = this.typeahead(event.key);
+                this.select($match);
+            } else {
+                let $match = this.typeahead(event.key);
+                this.highlight($match);
+            }
+
         });
     }
 
@@ -259,25 +267,24 @@ export default class A11ySelect extends HTMLElement {
             }
         }
 
-        // If a fullly or partially matching option has been,
-        // it is highlighted and the cache is updated.
-        if($fullMatch) {
-            this.highlight($fullMatch);
-            this._typeaheadCache = filter;
-        } else if($partialMatch) {
-            this.highlight($partialMatch);
-            this._typeaheadCache = event.key;
-        } else {
-            this._typeaheadCache = null;
-        }
-
-        // Finally, a timeout is set to reset the filter cache
-        // after a given period of inactivity. If a new key is
-        // pressed before the timeout expires, it is cancelled
-        // at the beginning of this method.
+        // Reset the filter cache after a given period of inactivity.
+        // If another key is pressed before the timeout expires, it
+        // is cancelled at the beginning of this method.
         this._typeaheadTimeout = setTimeout(() => {
             this._typeaheadCache = null;
         }, 500);
+
+        // If a fullly or partially matching option has been,
+        // it is returned and the cache is updated.
+        if($fullMatch) {
+            this._typeaheadCache = filter;
+            return $fullMatch
+        } else if($partialMatch) {
+            this._typeaheadCache = event.key;
+            return $partialMatch;
+        } else {
+            this._typeaheadCache = null;
+        }
         
     }
 
