@@ -106,7 +106,7 @@ export default class A11ySelect extends HTMLElement {
             if(!this.isOpen) {
 
                 // opens select on arrow up/down or space key
-                if([' ', 'Spacebar', 'ArrowUp', 'ArrowDown'].includes(event.key)) {
+                if([' ', 'Spacebar', 'Enter', 'ArrowUp', 'ArrowDown'].includes(event.key)) {
                     event.preventDefault();
                     this.open();
                     return;
