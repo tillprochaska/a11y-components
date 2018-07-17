@@ -74,12 +74,12 @@
 /*
  * Focus State
  */
-:host(:focus) {
+:host(:focus-within) {
     border-color: var(--border-focus-color);
     box-shadow: 0 0 0 3px var(--box-shadow-focus-color);
 }
 
-:host(:focus) > .select-options {
+:host(:focus-within) > .select-options {
     border-top-color: var(--border-focus-color);
 }
 

@@ -10,7 +10,8 @@ export default class A11ySelect extends HTMLElement {
         super();
 
         this.tabIndex = 0;
-        this.setAttribute('role', 'listbox');
+        this.setAttribute('role', 'menu');
+        this.setAttribute('aria-haspopup', 'true');
         this.close();
     }
 
@@ -24,7 +25,8 @@ export default class A11ySelect extends HTMLElement {
 
         this.$label = createElement('span', {
             attrs: {
-                class: 'select-field-label'
+                class: 'select-field-label',
+                role: 'presentation'
             }
         });
 
@@ -45,7 +47,8 @@ export default class A11ySelect extends HTMLElement {
         // create visible field
         this.$field = createElement('div', {
             attrs: {
-                class: 'select-field'
+                class: 'select-field',
+                role: 'presentation'
             },
             html: [ this.$label, $icon ]
         });
@@ -53,7 +56,8 @@ export default class A11ySelect extends HTMLElement {
         // create options list
         this.$options = createElement('div', {
             attrs: {
-                class: 'select-options'
+                class: 'select-options',
+                role: 'presentation'
             },
             html: createElement('slot')
         });
@@ -70,9 +74,17 @@ export default class A11ySelect extends HTMLElement {
             this.select(this.value);
         });
 
-        // close/toggle select on click/blur
-        this.addEventListener('blur', event => this.close());
+        // toggle select on click
         this.$field.addEventListener('click', event => this.toggle());
+
+        // close select if focus moves out of select
+        this.addEventListener('focusout', event => {
+            window.setTimeout(() => {
+                if(!this.contains(document.activeElement)) {
+                    this.close();
+                }
+            }, 0);
+        });
 
         // This listens for the custom `select` event, which is
         // usually fired by instances of A11ySelectOption on click.
@@ -80,6 +92,7 @@ export default class A11ySelect extends HTMLElement {
             if(event.target instanceof A11ySelectOption) {
                 this.select(event.target);
                 this.close();
+                this.focus();
             }
         });
 
@@ -113,6 +126,7 @@ export default class A11ySelect extends HTMLElement {
                     let $highlighted = this._getHighlightedOptionNode();
                     this.select($highlighted);
                     this.close();
+                    this.focus();
                     return;
                 }
 
@@ -142,17 +156,17 @@ export default class A11ySelect extends HTMLElement {
         let $options = this._getOptionNodes();
         let $selected = this._getSelectedOptionNode();
 
+        // if there aren’t any options, return an empty string
         if($options.length < 1) {
             return '';
         }
 
-        // If no option is selected explicitly, autoselect
-        // the first option.
-        if($selected) {
-            return $selected.value;
-        } else {
+        // if no option is selected explicitly, return first option
+        if(!$selected) {
             return $options[0].value;
         }
+
+        return $selected.value;
     }
 
     set value(value) {
@@ -177,6 +191,7 @@ export default class A11ySelect extends HTMLElement {
 
         // update the select’s label
         this.$label.innerHTML = $selected.label;
+        // this.setAttribute('aria-label', $selected.label);
     }
 
     // highlight an option by element reference or value
@@ -250,6 +265,7 @@ export default class A11ySelect extends HTMLElement {
         this._typeaheadTimeout = setTimeout(() => {
             this._typeaheadCache = null;
         }, 500);
+        
     }
 
     toggle() {
