@@ -12,6 +12,7 @@
     "rollup": "^0.62.0",
     "rollup-plugin-string": "^2.0.2",
     "serve": "^9.2.0",
+    "wdio-browserstack-service": "^0.1.16",
     "wdio-mocha-framework": "^0.6.2",
     "wdio-selenium-standalone-service": "^0.0.10",
     "wdio-spec-reporter": "^0.1.5",
