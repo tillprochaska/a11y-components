@@ -1,10 +1,5 @@
 const { getOptionsScrollTop } = require('../support/helpers.js');
-
-const chai = require('chai');
-global.expect = chai.expect;
-chai.Should();
-
-const URL = '/test/fixtures/large-dataset';
+const URL = '/test/fixtures/large-dataset.html';
 
 describe('select component with many options', () => {
 

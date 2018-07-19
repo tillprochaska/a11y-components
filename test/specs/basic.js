@@ -1,10 +1,5 @@
 const { isExpanded, isClosed, isFocussed, isSelected, isHighlighted } = require('../support/helpers.js');
-
-const chai = require('chai');
-global.expect = chai.expect;
-chai.Should();
-
-const URL = '/test/fixtures/basic';
+const URL = '/test/fixtures/basic.html';
 
 describe('basic select component', () => {
 

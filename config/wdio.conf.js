@@ -1,14 +1,11 @@
-exports.config = {
+let service = process.env.TRAVIS ? 'remote' : 'local';
+let envConfig = require(`./wdio.${ service }.conf.js`);
+
+let config = {
 
     specs: [
         './test/specs/**/*.js'
     ],
-
-    services: ['selenium-standalone'],
-    maxInstances: 1,
-    capabilities: [{
-        browserName: 'chrome'
-    }],
 
     sync: true,
     logLevel: 'silent',
@@ -17,7 +14,6 @@ exports.config = {
 
     bail: 0,
     screenshotPath: './screenshots',
-    baseUrl: 'http://localhost:5000',
     connectionRetryCount: 3,
 
     reporters: ['spec'],
@@ -26,4 +22,13 @@ exports.config = {
         ui: 'bdd'
     },
 
-}
+    before() {
+        const chai = require('chai');
+        global.expect = chai.expect;
+        chai.Should();
+    }
+
+};
+
+config = Object.assign(config, envConfig);
+module.exports = { config };
