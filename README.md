@@ -1,5 +1,9 @@
 # Accessible Select
 
+[![Build Status](https://travis-ci.com/tillprochaska/accessible-select.svg?branch=develop)](https://travis-ci.com/tillprochaska/accessible-select)
+[![BrowserStack Status](https://www.browserstack.com/automate/badge.svg?badge_key=Rkt0U0dvTWErZ1NSZjE2b3hkOWh4SmQ4dDMxRkhmQitjcjM4cmNNUmlobz0tLWV6SjZLbHlhaFkxQ1NUbDZsa3lkdEE9PQ==--bd1a8969cfe551028fe9f2511745f021efe95942)](https://www.browserstack.com/automate/public-build/Rkt0U0dvTWErZ1NSZjE2b3hkOWh4SmQ4dDMxRkhmQitjcjM4cmNNUmlobz0tLWV6SjZLbHlhaFkxQ1NUbDZsa3lkdEE9PQ==--bd1a8969cfe551028fe9f2511745f021efe95942)
+
+
 An accessible, small and simple select component built on top of the Custom Elements and Shadow DOM standards.
 
 ***
