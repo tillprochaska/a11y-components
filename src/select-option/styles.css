@@ -3,7 +3,7 @@
     display: block;
     margin: -1px;
     padding: var(--padding-v) var(--padding-h);
-    border: 1px solid var(--border-color-light);
+    border: var(--border-width) solid var(--border-color-light);
 
     white-space: nowrap;
     overflow: hidden;
