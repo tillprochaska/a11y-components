@@ -1,5 +1,5 @@
 :host {
-	position: relative;
+    position: relative;
     display: block;
     margin: -1px;
     padding: var(--padding-v) var(--padding-h);
@@ -10,44 +10,19 @@
     text-overflow: ellipsis;
 }
 
-.select-option-icon {
-	position: absolute;
-	top: 50%;
-	right: var(--padding-h);
-	transform: translateY(-50%);
-
-	display: none;
-	width: calc(.9 * var(--icon-size));
-	height: calc(.9 * var(--icon-size));
-}
-
-/*
- * Highlighted State
- */
-
 :host(:focus), :host([selected]) {
     padding-right: calc(2 * var(--padding-h) + .9 * var(--icon-size));
+    background-size: calc(.85 * var(--icon-size));
+    background-position: center right var(--padding-h);
+    background-repeat: no-repeat;
 }
 
 :host(:focus) {
     background-color: var(--background-color);
     outline: none;
+    background-image: url('./checkmark.svg');
 }
 
-:host(:focus) > .select-option-icon {
-	display: block;
-	fill: #999;
-}
-
-/*
- * Selected State
- */
 :host([selected]) {
-	display: block;
-	fill: #000;
-}
-
-:host([selected]) > .select-option-icon {
-	display: block;
-	fill: #000;
+    background-image: url('./checkmark-selected.svg');
 }

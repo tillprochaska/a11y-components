@@ -29,26 +29,12 @@ export default class A11ySelect extends HTMLElement {
             }
         });
 
-        // create dropdown icon
-        let $icon = createSvgElement('svg', {
-            attrs: {
-                class: 'select-field-icon',
-                viewBox: '0 0 32 32',
-                'aria-hidden': 'true'
-            },
-            html: createSvgElement('path', {
-                attrs: {
-                    d: 'M16.003 18.626l7.081-7.081L25 13.46l-8.997 8.998-9.003-9 1.917-1.916z'
-                }
-            })
-        });
-
         // create visible field
         this.$field = createElement('div', {
             attrs: {
                 class: 'select-field',
             },
-            html: [ this.$label, $icon ]
+            html: this.$label
         });
 
         // create options list

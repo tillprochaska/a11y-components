@@ -1,4 +1,5 @@
-import string from 'rollup-plugin-string';
+import postcss from 'rollup-plugin-postcss';
+import url from 'postcss-url';
 import pkg from '../package.json';
 
 const name = pkg.name
@@ -20,9 +21,12 @@ export default {
     experimentalCodeSplitting: true,
 
     plugins: [
-        string({
-            include: '**/*.css',
+        postcss({
+            inject: false,
+            plugins: [
+                url({ url: 'inline' }),
+            ],
         }),
-    ]
-    
+    ],
+
 };

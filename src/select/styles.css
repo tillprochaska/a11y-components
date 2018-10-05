@@ -40,20 +40,14 @@
     padding: var(--padding-v) var(--padding-h);
     padding-right: calc(2 * var(--padding-v) + var(--icon-size));
 
+    background-image: url('./chevron.svg');
+    background-size: var(--icon-size);
+    background-position: center right var(--padding-h);
+    background-repeat: no-repeat;
+
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-}
-
-.select-field-icon {
-    position: absolute;
-    top: 50%;
-    right: var(--padding-h);
-    transform: translateY(-50%);
-
-    width: var(--icon-size);
-    height: var(--icon-size);
-    fill: var(--color);
 }
 
 .select-options {
@@ -92,8 +86,8 @@
     border-bottom-right-radius: 0;
 }
 
-:host([aria-expanded="true"]) > .select-field > .select-field-icon {
-    transform: translateY(-50%) rotate(180deg);
+:host([aria-expanded="true"]) > .select-field {
+    background-image: url('./chevron-active.svg');
 }
 
 :host([aria-expanded="true"]) > .select-options {
