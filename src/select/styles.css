@@ -61,7 +61,7 @@
     overflow: hidden;
 
     display: none;
-    max-height: calc(var(--visible-options) * var(--option-height) + (var(--visible-options) - 1) * var(--border-width));
+    max-height: calc(var(--visible-options) * var(--option-height));
     overflow-y: scroll;
 
     background-color: #fff;
