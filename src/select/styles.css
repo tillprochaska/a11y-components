@@ -1,4 +1,7 @@
 :host {
+    --visible-options: 5;
+    --option-height: calc(2 * var(--padding-v) + var(--spacing-unit));
+
     --font-size: 16px;
     --spacing-unit: calc(1.5 * var(--font-size));
     --font-family: system-ui;
@@ -9,6 +12,7 @@
     --icon-size: var(--spacing-unit);
 
     --border-radius: 2px;
+    --border-width: 1px;
     --border-color: #ccc;
     --border-color-light: #eee;
     --border-focus-color: rgb(0, 161, 255);
@@ -26,7 +30,7 @@
     font-family: var(--font-family);
     color: var(--color);
     background-color: var(--background-color);
-    border: 1px solid var(--border-color);
+    border: var(--border-width) solid var(--border-color);
     border-radius: var(--border-radius);
 
     cursor: default;
@@ -57,11 +61,11 @@
     overflow: hidden;
 
     display: none;
-    max-height: 250px;
+    max-height: calc(var(--visible-options) * var(--option-height));
     overflow-y: scroll;
 
     background-color: #fff;
-    border: 1px solid var(--border-color);
+    border: var(--border-width) solid var(--border-color);
     border-bottom-left-radius: var(--border-radius);
     border-bottom-right-radius: var(--border-radius);
 }
