@@ -77,22 +77,25 @@ describe('basic select component', () => {
             isSelected('Apples');
         })
 
-        it('selects the currently highlighted option on space bar', () => {
+        it('selects the currently highlighted option on space bar keeps focus', () => {
             browser.keys(['ArrowDown', ' ']);
             isSelected('Mangos');
             isClosed();
+            isFocussed();
         });
 
-        it('selects the currently highlighted option on enter', () => {
+        it('selects the currently highlighted option on enter and keeps focus', () => {
             browser.keys(['ArrowDown', 'Enter']);
             isSelected('Mangos');
             isClosed();
+            isFocussed();
         });
 
-        it('does not change the selected option on escape', () => {
+        it('does not change the selected option on escape and keeps focus', () => {
             browser.keys(['ArrowDown', 'Escape']);
             isSelected('Apples');
             isClosed();
+            isFocussed();
         });
 
     });

@@ -117,6 +117,7 @@ export default class A11ySelect extends HTMLElement {
                 // close on escape key
                 if(['Escape', 'Esc'].includes(event.key)) {
                     this.close();
+                    this.focus();
                     return;
                 }
 
