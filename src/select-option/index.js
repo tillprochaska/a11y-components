@@ -18,22 +18,6 @@ export default class A11ySelectOption extends HTMLElement {
 
     _addElements() {
         let shadowRoot = attachShadow(this, styles);
-
-        let $icon = createSvgElement('svg', {
-            attrs: {
-                viewBox: '0 0 32 32',
-                class: 'select-option-icon',
-                'aria-hidden': 'true'
-            },
-            html: createSvgElement('path', {
-                attrs: {
-                    d: 'M5 16.577l2.194-2.195 5.486 5.484L24.804 7.743 27 9.937l-14.32 14.32z'
-                }
-            })
-        });
-
-        shadowRoot.appendChild($icon);
-
         let $slot = createElement('slot');
         shadowRoot.appendChild($slot);
     }
