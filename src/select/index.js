@@ -120,11 +120,19 @@ export default class A11ySelect extends HTMLElement {
                     return;
                 }
 
-                // highlights previous option on arrow up
+                // highlights previous/first option on arrow up
                 if(event.key === 'ArrowUp') {
                     event.preventDefault();
+                    let $prev;
 
-                    let $prev = this._getHighlightedOptionNode()._getPreviousOptionNode();
+                    if(event.metaKey || event.altKey || event.ctrlKey) {
+                        // if meta/alt/ctrl key is pressed, jump to first option
+                        $prev = this._getOptionNodes()[0];
+                    } else {
+                        // otherwise highlight previous option
+                        $prev = this._getHighlightedOptionNode()._getPreviousOptionNode();
+                    }
+
                     this._scrollOptionIntoView($prev, 'top');
                     this.highlight($prev);
 
@@ -134,8 +142,17 @@ export default class A11ySelect extends HTMLElement {
                 // highlights next option on arrow down
                 if(event.key === 'ArrowDown') {
                     event.preventDefault();
+                    let $next;
 
-                    let $next = this._getHighlightedOptionNode()._getNextOptionNode();
+                    if(event.metaKey || event.altKey || event.ctrlKey) {
+                        // if meta/alt/ctrl key is pressed, jump to last option
+                        let $options = this._getOptionNodes();
+                        $next = $options[$options.length - 1];
+                    } else {
+                        // otherwise highlight next option
+                        $next = this._getHighlightedOptionNode()._getNextOptionNode();
+                    }
+
                     this._scrollOptionIntoView($next, 'bottom');
                     this.highlight($next);
 
@@ -285,7 +302,7 @@ export default class A11ySelect extends HTMLElement {
         } else {
             this._typeaheadCache = null;
         }
-        
+
     }
 
     toggle() {

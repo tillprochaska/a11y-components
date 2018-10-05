@@ -57,6 +57,26 @@ describe('basic select component', () => {
             isSelected('Apples');
         });
 
+        it('highlights first/last option on arrow up/down and cmd/alt/control', () => {
+            // Meta keys vary on different operating systems, so it’s
+            // sufficient to test if any of the following key combinations
+            // passes the test.
+
+            browser.keys(['Control', 'ArrowDown']);
+            browser.keys(['Meta', 'ArrowDown']);
+            browser.keys(['Alt', 'ArrowDown']);
+
+            isHighlighted('Oranges');
+            isSelected('Apples');
+
+            browser.keys(['Control', 'ArrowUp']);
+            browser.keys(['Meta', 'ArrowUp']);
+            browser.keys(['Alt', 'ArrowUp']);
+
+            isHighlighted('Apples');
+            isSelected('Apples');
+        })
+
         it('selects the currently highlighted option on space bar', () => {
             browser.keys(['ArrowDown', ' ']);
             isSelected('Mangos');
