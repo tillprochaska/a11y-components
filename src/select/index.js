@@ -98,7 +98,9 @@ export default class A11ySelect extends HTMLElement {
                     return;
                 }
 
-            } else {
+            }
+
+            if(this.isOpen) {
 
                 // close on escape key
                 if(['Escape', 'Esc'].includes(event.key)) {
@@ -110,18 +112,18 @@ export default class A11ySelect extends HTMLElement {
                 // highlights previous/first option on arrow up
                 if(event.key === 'ArrowUp') {
                     event.preventDefault();
-                    let $prev;
+                    let $previous;
 
                     if(event.metaKey || event.altKey || event.ctrlKey) {
                         // if meta/alt/ctrl key is pressed, jump to first option
-                        $prev = this._getOptionNodes()[0];
+                        this.highlightFirst();
                     } else {
                         // otherwise highlight previous option
-                        $prev = this._getHighlightedOptionNode()._getPreviousOptionNode();
+                        this.highlightPrevious();
                     }
 
-                    this._scrollOptionIntoView($prev, 'top');
-                    this.highlight($prev);
+                    let $highlighted = this._getHighlightedOptionNode();
+                    this._scrollOptionIntoView($highlighted, 'top');
 
                     return;
                 }
@@ -129,19 +131,17 @@ export default class A11ySelect extends HTMLElement {
                 // highlights next option on arrow down
                 if(event.key === 'ArrowDown') {
                     event.preventDefault();
-                    let $next;
 
                     if(event.metaKey || event.altKey || event.ctrlKey) {
                         // if meta/alt/ctrl key is pressed, jump to last option
-                        let $options = this._getOptionNodes();
-                        $next = $options[$options.length - 1];
+                        this.highlightLast();
                     } else {
                         // otherwise highlight next option
-                        $next = this._getHighlightedOptionNode()._getNextOptionNode();
+                        this.highlightNext();
                     }
 
-                    this._scrollOptionIntoView($next, 'bottom');
-                    this.highlight($next);
+                    let $highlighted = this._getHighlightedOptionNode();
+                    this._scrollOptionIntoView($highlighted, 'bottom');
 
                     return;
                 }
@@ -184,7 +184,7 @@ export default class A11ySelect extends HTMLElement {
 
         // if no option is selected explicitly, return first option
         if(!$selected) {
-            return $options[0].value;
+            return this._getNextSelectableOptionNode();
         }
 
         return $selected.value;
@@ -226,6 +226,10 @@ export default class A11ySelect extends HTMLElement {
         let $options = this._getOptionNodes();
         let $highlighted = this._getOptionNode(option);
 
+        if(!$highlighted || !$highlighted.isSelectable()) {
+            return;
+        }
+
         // highlight given option, remove highlight from all
         // other options
         $options.forEach($option => {
@@ -235,6 +239,30 @@ export default class A11ySelect extends HTMLElement {
                 $option.highlighted = true;
             }
         });
+    }
+
+    highlightFirst() {
+        let $options = this._getSelectableOptionNodes();
+        if($options.length <= 0) return;
+        this.highlight($options[0]);
+    }
+
+    highlightLast() {
+        let $options = this._getSelectableOptionNodes();
+        if($options.length <= 0) return;
+        this.highlight($options[$options.length - 1]);
+    }
+
+    highlightNext() {
+        let $highlighted = this._getHighlightedOptionNode();
+        let $next = this._getNextSelectableOptionNode($highlighted);
+        this.highlight($next);
+    }
+
+    highlightPrevious() {
+        let $highlighted = this._getHighlightedOptionNode();
+        let $previous = this._getPreviousSelectableOptionNode($highlighted);
+        this.highlight($previous);
     }
 
     // highlight the first option that starts with
@@ -261,9 +289,10 @@ export default class A11ySelect extends HTMLElement {
         let $partialMatch = null;
 
         for(let $option of $options) {
+            if(!$option.isSelectable()) continue;
             let label = $option.label.toLowerCase();
 
-            if(!$fullMatch && label.startsWith(filter)) {
+            if(label.startsWith(filter)) {
                 $fullMatch = $option;
                 break;
             } else if(!$partialMatch && label.startsWith(event.key)) {
@@ -337,14 +366,18 @@ export default class A11ySelect extends HTMLElement {
         }
     }
 
-    _getOptionNodes() {
+    _getOptionNodes(filter = () => true) {
         return this
             .shadowRoot
             .querySelector('slot')
             .assignedNodes()
             .filter($node => {
-                return $node instanceof A11ySelectOption;
+                return $node instanceof A11ySelectOption && filter($node);
             });
+    }
+
+    _getSelectableOptionNodes() {
+        return this._getOptionNodes($node => $node.isSelectable());
     }
 
     // helper to find an option by element reference or value
@@ -364,6 +397,68 @@ export default class A11ySelect extends HTMLElement {
 
     _getHighlightedOptionNode() {
         return this._getOptionNodes().find($option => $option.highlighted);
+    }
+
+    _getNextOptionNode(option, filter = () => true, ring = false) {
+        let $option = this._getOptionNode(option);
+
+        // if no valid option is given, return the first option
+        if(!$option) {
+            return this._getOptionNodes(filter)[0];
+        }
+
+        let $next = $option._getNextOptionNode();
+        let passesFilter = $next && filter($next);
+
+        while($next && $next !== $option && !passesFilter) {
+            $next = $next._getNextOptionNode();
+
+            if(!$next && ring) {
+                $next = this._getOptionNodes()[0];
+            }
+
+            passesFilter = $next && filter($next);
+        }
+
+        return $next;
+    }
+
+    _getNextSelectableOptionNode(option, filter = () => true, ring) {
+        return this._getNextOptionNode(option, $node => {
+            return $node.isSelectable() && filter($node);
+        }, ring);
+    }
+
+    _getPreviousOptionNode(option, filter = () => true, ring = false) {
+        let $option = this._getOptionNode(option);
+
+        // if no option is given, return the last option
+        if(!$option) {
+            let $options = this._getOptionNodes(filter);
+            return $options[$options.length - 1];
+        }
+
+        let $previous = $option._getPreviousOptionNode();
+        let passesFilter = $previous && filter($previous);
+
+        while($previous && $previous !== $option && !passesFilter) {
+            $previous = $previous._getPreviousOptionNode();
+
+            if(!$previous && ring) {
+                $options = this.getOptionNodes();
+                $previous = $options[$options.length];
+            }
+
+            passesFilter = $previous && filter($previous);
+        }
+
+        return $previous;
+    }
+
+    _getPreviousSelectableOptionNode(option, filter = () => true, ring) {
+        return this._getPreviousOptionNode(option, $node => {
+            return $node.isSelectable() && filter($node);
+        }, ring);
     }
 
 }

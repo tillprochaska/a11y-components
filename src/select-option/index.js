@@ -23,13 +23,23 @@ export default class A11ySelectOption extends HTMLElement {
     }
 
     _addListeners() {
+        this.addEventListener('mousedown', event => {
+            // If the option is not selectable (e. g. it’s disabled)
+            // prevent loosing focus and do not send any events.
+            // Ad the `click` event is fired after pressing and releasing
+            // the mouse, but focus shifts as soon as the `mousedown` event
+            // occurs on a focussable element, we need to prevent it
+            // in this event handler.
+            event.preventDefault();
+        });
+
         this.addEventListener('click', event => {
             // Stopping the event from bubbling up in order
             // to prevent event listeners on the main select
             // to reopen the component etc.
             event.stopPropagation();
-            let click = new CustomEvent('select', { bubbles: true });
-            this.dispatchEvent(click);
+            if(!this.isSelectable()) return;
+            this.select();
         });
 
         this.addEventListener('keydown', event => {
@@ -37,16 +47,13 @@ export default class A11ySelectOption extends HTMLElement {
                 // Stopping event propagation for the same
                 // reasons as above.
                 event.stopPropagation();
-                let select = new CustomEvent('select', { bubbles: true });
-                this.dispatchEvent(select);
+                this.select();
             }
         });
 
         this.addEventListener('mousemove', () => {
-            if(!this.highlighted) {
-                let event = new CustomEvent('highlight', { bubbles: true });
-                this.dispatchEvent(event);
-            }
+            if(!this.isSelectable()) return;
+            if(!this.highlighted) this.highlight();
         });
     }
 
@@ -88,6 +95,20 @@ export default class A11ySelectOption extends HTMLElement {
         }
     }
 
+    get disabled() {
+        return this.hasAttribute('disabled');
+    }
+
+    set disabled(value) {
+        if(value) {
+            this.setAttribute('value', value);
+            // this.tabIndex = -1;
+        } else {
+            this.removeAttribute('disabled', value);
+            // this.tabIndex = null;
+        }
+    }
+
     get highlighted() {
         return document.activeElement === this;
     }
@@ -96,6 +117,20 @@ export default class A11ySelectOption extends HTMLElement {
         if(value) {
             this.focus();
         }
+    }
+
+    highlight() {
+        let event = new CustomEvent('highlight', { bubbles: true });
+        this.dispatchEvent(event);
+    }
+
+    select() {
+        let click = new CustomEvent('select', { bubbles: true });
+        this.dispatchEvent(click);
+    }
+
+    isSelectable() {
+        return !this.disabled;
     }
 
     _getNextOptionNode() {
