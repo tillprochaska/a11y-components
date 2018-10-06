@@ -11,19 +11,32 @@
     text-overflow: ellipsis;
 }
 
-:host(:focus), :host([selected]) {
+/*
+ * Highlighted State
+ */
+:host(:focus:not([disabled])), :host([selected]:not([disabled])) {
     padding-right: calc(2 * var(--padding-h) + .9 * var(--icon-size));
     background-size: calc(.85 * var(--icon-size));
     background-position: center right var(--padding-h);
     background-repeat: no-repeat;
 }
 
-:host(:focus) {
+/*
+ * Selected State
+ */
+:host(:focus:not([disabled])) {
     background-color: var(--background-color);
     outline: none;
     background-image: url('./checkmark.svg');
 }
 
-:host([selected]) {
+:host([selected]:not([disabled])) {
     background-image: url('./checkmark-selected.svg');
 }
+
+/*
+ * Disabled State
+ */
+ :host([disabled]) {
+    color: #999;
+ }
