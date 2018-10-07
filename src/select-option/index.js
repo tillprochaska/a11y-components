@@ -38,8 +38,9 @@ export default class A11ySelectOption extends HTMLElement {
             // to prevent event listeners on the main select
             // to reopen the component etc.
             event.stopPropagation();
-            if(!this.isSelectable()) return;
-            this.select();
+            if(this.isSelectable()) {
+                this.select();
+            }
         });
 
         this.addEventListener('keydown', event => {
@@ -47,13 +48,16 @@ export default class A11ySelectOption extends HTMLElement {
                 // Stopping event propagation for the same
                 // reasons as above.
                 event.stopPropagation();
-                this.select();
+                if(this.isSelectable()) {
+                    this.select();
+                }
             }
         });
 
         this.addEventListener('mousemove', () => {
-            if(!this.isSelectable()) return;
-            if(!this.highlighted) this.highlight();
+            if(this.isSelectable() && !this.highlighted) {
+                this.highlight();
+            }
         });
     }
 
@@ -81,6 +85,12 @@ export default class A11ySelectOption extends HTMLElement {
         }
     }
 
+    select() {
+        this.selected = true;
+        let click = new CustomEvent('select', { bubbles: true });
+        this.dispatchEvent(click);
+    }
+
     get selected() {
         return this.hasAttribute('selected');
     }
@@ -95,18 +105,10 @@ export default class A11ySelectOption extends HTMLElement {
         }
     }
 
-    get disabled() {
-        return this.hasAttribute('disabled');
-    }
-
-    set disabled(value) {
-        if(value) {
-            this.setAttribute('value', value);
-            // this.tabIndex = -1;
-        } else {
-            this.removeAttribute('disabled', value);
-            // this.tabIndex = null;
-        }
+    highlight() {
+        this.highlighted = true;
+        let event = new CustomEvent('highlight', { bubbles: true });
+        this.dispatchEvent(event);
     }
 
     get highlighted() {
@@ -119,14 +121,16 @@ export default class A11ySelectOption extends HTMLElement {
         }
     }
 
-    highlight() {
-        let event = new CustomEvent('highlight', { bubbles: true });
-        this.dispatchEvent(event);
+    get disabled() {
+        return this.hasAttribute('disabled');
     }
 
-    select() {
-        let click = new CustomEvent('select', { bubbles: true });
-        this.dispatchEvent(click);
+    set disabled(value) {
+        if(value) {
+            this.setAttribute('value', value);
+        } else {
+            this.removeAttribute('disabled', value);
+        }
     }
 
     isSelectable() {
