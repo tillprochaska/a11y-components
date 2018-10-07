@@ -10,7 +10,7 @@ let config = {
     sync: true,
     logLevel: 'silent',
     coloredLogs: true,
-    deprecationWarnings: true,
+    deprecationWarnings: false,
 
     bail: 0,
     screenshotPath: './screenshots',

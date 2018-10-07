@@ -63,36 +63,34 @@ export default class A11ySelect extends HTMLElement {
 
         // close select if focus moves out of select
         this.addEventListener('focusout', event => {
-            window.setTimeout(() => {
-                if(!this.contains(document.activeElement)) {
-                    this.close();
-                }
-            }, 0);
+            // checks wether the element receiving focus is
+            // an option inside the select
+            if(!this.contains(event.relatedTarget)) {
+                this.close();
+            }
         });
 
         // This listens for the custom `select` event, which is
         // usually fired by instances of A11ySelectOption on click.
         this.addEventListener('select', event => {
-            if(event.target instanceof A11ySelectOption) {
-                this.select(event.target);
-                this.close();
-                this.focus();
-            }
+            this._handleSelection(event.target);
+            this.close();
+            this.focus();
         });
 
         // This listens for the custom `highlight` event, which is
         // usually fired by instances of A11ySelectOption on mouseover.
         this.addEventListener('highlight', event => {
-            if(event.target instanceof A11ySelectOption) {
-                this.highlight(event.target);
-            }
+            this._handleHighlighting(event.target);
         });
 
         this.addEventListener('keydown', event => {
-            if(!this.isOpen) {
 
+            if(!this.isOpen) {
                 // opens select on arrow up/down or space key
                 if([' ', 'Spacebar', 'Enter', 'ArrowUp', 'ArrowDown'].includes(event.key)) {
+                    // By default, pressing the spacebar or one of the
+                    // arrow keys would scroll the options list.
                     event.preventDefault();
                     this.open();
                     return;
@@ -111,6 +109,11 @@ export default class A11ySelect extends HTMLElement {
 
                 // highlights previous/first option on arrow up
                 if(event.key === 'ArrowUp') {
+                    // By default, pressing the arrow up/down keys would
+                    // scroll the offset parent of the active (focussed)
+                    // element. We manually make sure that the highlighted
+                    // element is always visible and do not want the
+                    // browser’s default behaviour in this case.
                     event.preventDefault();
                     let $previous;
 
@@ -122,14 +125,13 @@ export default class A11ySelect extends HTMLElement {
                         this.highlightPrevious();
                     }
 
-                    let $highlighted = this._getHighlightedOptionNode();
-                    this._scrollOptionIntoView($highlighted, 'top');
-
                     return;
                 }
 
                 // highlights next option on arrow down
                 if(event.key === 'ArrowDown') {
+                    // Preventing the browser’s default behaviour for the
+                    // same reason as above.
                     event.preventDefault();
 
                     if(event.metaKey || event.altKey || event.ctrlKey) {
@@ -140,9 +142,6 @@ export default class A11ySelect extends HTMLElement {
                         this.highlightNext();
                     }
 
-                    let $highlighted = this._getHighlightedOptionNode();
-                    this._scrollOptionIntoView($highlighted, 'bottom');
-
                     return;
                 }
 
@@ -151,10 +150,10 @@ export default class A11ySelect extends HTMLElement {
             // directly select matching option if closed,
             // otherwise just highlight
             if(!this.isOpen) {
-                let $match = this.typeahead(event.key);
+                let $match = this._typeahead(event.key);
                 this.select($match);
             } else {
-                let $match = this.typeahead(event.key);
+                let $match = this._typeahead(event.key);
                 this.highlight($match);
             }
 
@@ -194,51 +193,37 @@ export default class A11ySelect extends HTMLElement {
         this.select(value);
     }
 
-    // select an option by element reference or value
-    select(option) {
-        if(!option) return;
-
-        let $options = this._getOptionNodes();
-        let $selected = this._getOptionNode(option);
-
-        // select given option, unselect any other options
-        $options.forEach($option => {
-            if($option !== $selected) {
-                $option.selected = false;
-            } else {
-                $option.selected = true;
-            }
-        });
-
-        // update the select’s label
-        this.$label.innerHTML = $selected.label;
-        if(this.label) {
-            this.setAttribute('aria-label', `${ this.label }: ${ $selected.label }`);
+    toggle() {
+        if(this.isOpen) {
+            this.close();
         } else {
-            this.setAttribute('aria-label', $selected.label);
+            this.open();
         }
     }
 
-    // highlight an option by element reference or value
+    open() {
+        this.isOpen = true;
+        this.setAttribute('aria-expanded', 'true');
+        this._scrollOptionIntoView(this.value);
+        this.highlight(this.value);
+    }
+
+    close() {
+        this.isOpen = false;
+        this.setAttribute('aria-expanded', 'false');
+    }
+
+    select(option) {
+        let $option = this._getOptionNode(option);
+        if(!$option) return;
+        $option.select();
+    }
+
     highlight(option) {
-        if(!option) return;
-
-        let $options = this._getOptionNodes();
-        let $highlighted = this._getOptionNode(option);
-
-        if(!$highlighted || !$highlighted.isSelectable()) {
-            return;
-        }
-
-        // highlight given option, remove highlight from all
-        // other options
-        $options.forEach($option => {
-            if($option !== $highlighted) {
-                $option.highlighted = false;
-            } else {
-                $option.highlighted = true;
-            }
-        });
+        let $option = this._getOptionNode(option);
+        if(!$option) return;
+        this._scrollOptionIntoView($option);
+        $option.highlight();
     }
 
     highlightFirst() {
@@ -265,9 +250,42 @@ export default class A11ySelect extends HTMLElement {
         this.highlight($previous);
     }
 
-    // highlight the first option that starts with
+    _handleSelection(option) {
+        let $options = this._getOptionNodes();
+        let $selected = this._getOptionNode(option);
+
+        // select given option, unselect any other options
+        $options.forEach($option => {
+            if($option !== $selected) {
+                $option.selected = false;
+            }
+        });
+
+        // update the select’s label
+        this.$label.innerHTML = $selected.label;
+        if(this.label) {
+            this.setAttribute('aria-label', `${ this.label }: ${ $selected.label }`);
+        } else {
+            this.setAttribute('aria-label', $selected.label);
+        }
+    }
+
+    _handleHighlighting(option) {
+        // un-highlights all options except the given option
+        let $options = this._getOptionNodes();
+        let $highlighted = this._getOptionNode(option);
+
+        // remove highlight from all other options
+        $options.forEach($option => {
+            if($option !== $highlighted) {
+                $option.highlighted = false;
+            }
+        });
+    }
+
+    // returns the first option that starts with
     // the given key or key sequence
-    typeahead(key) {
+    _typeahead(key) {
 
         // Cancel a potential timeout that has been set after
         // previous keyboard events
@@ -321,32 +339,12 @@ export default class A11ySelect extends HTMLElement {
 
     }
 
-    toggle() {
-        if(this.isOpen) {
-            this.close();
-        } else {
-            this.open();
-        }
-    }
-
-    open() {
-        this.isOpen = true;
-        this.setAttribute('aria-expanded', 'true');
-        this._scrollOptionIntoView(this.value);
-        this.highlight(this.value);
-    }
-
-    close() {
-        this.isOpen = false;
-        this.setAttribute('aria-expanded', 'false');
-    }
-
     // This methods makes sure that the given option is
     // in the visible part of the options list. The second
     // parameter specifies the scroll direction. If the
     // given is not visible, `top` and `bottom` scroll the
     // option to the top and bottom of the list, respectively.
-    _scrollOptionIntoView(option, dir = 'top') {
+    _scrollOptionIntoView(option, dir = 'nearest') {
         if(!option) return;
 
         let $option      = this._getOptionNode(option);
@@ -355,14 +353,32 @@ export default class A11ySelect extends HTMLElement {
         let optionTop    = $option.offsetTop;
         let optionHeight = $option.getBoundingClientRect().height;
 
-        if(optionTop < listScroll || optionTop + optionHeight > listScroll + listHeight) {
-            if(dir === 'top') {
-                // option is scrolled to the top
-                this.$options.scrollTop = optionTop;
-            } else {
-                // option is scrolled top the bottom
-                this.$options.scrollTop = optionTop - listHeight + optionHeight;
-            }
+        let isAboveViewport = optionTop < listScroll;
+        let isBelowViewport = optionTop + optionHeight > listScroll + listHeight;
+
+
+        if(!isAboveViewport && !isBelowViewport) {
+            return;
+        }
+
+        let scrollPosTop = optionTop;
+        let scrollPosBottom = optionTop - listHeight + optionHeight;
+
+        if(dir == 'nearest') {
+            let deltaTop = Math.abs(scrollPosTop - listScroll);
+            let deltaBottom = Math.abs(scrollPosBottom - listScroll);
+            dir = deltaTop <= deltaBottom ? 'top' : 'bottom';
+        }
+
+        if(dir === 'top') {
+            // option is scrolled to the top
+            this.$options.scrollTop = scrollPosTop;
+            return;
+        }
+
+        if(dir === 'bottom') {
+            // option is scrolled top the bottom
+            this.$options.scrollTop = scrollPosBottom;
         }
     }
 
